@@ -1,4 +1,4 @@
-//downloadImageByURL(process.argv.slice(2)
+
 var request = require('request');
 
 
@@ -6,34 +6,36 @@ var request = require('request');
 var GITHUB_USER = "agault";
 var GITHUB_TOKEN = "a51410f8cd2ebcb0b1884aa1d30cc200a3156548";
 
-
-
-
-function getRepoContributors(repoOwner, repoName, cb) {
+function getRepoContributors(repoOwner, repoName, callback) {
+  if (!repoOwner  || !repoName) {
+    console.log("error")
+    return;
+  }
   var requestURL = 'https://'+ GITHUB_USER + ':' + GITHUB_TOKEN + '@api.github.com/repos/' + repoOwner + '/' + repoName + '/contributors';
     var options = {
        url: requestURL,
         headers: {
           'User-Agent': 'Bacon'
-         }
- };
+        }
+    };
+
  request(options, function(err, response, body) {
    if (err) throw err;
    //console.log('Response Status Code:', body);
      var parsebody = JSON.parse(body);
      //console.log(parsebody)
-     cb(err, parsebody)
+     callback(err, parsebody)
  });
 }
-
-getRepoContributors("jquery", "jquery", function(err, result) {
+var callback = function(err, result) {
   // console.log("Errors:", err);
   // console.log("Result:", result);
   result.forEach(function (user){
     var filePath = "./avatars/" + user.login + ".png"
     downloadImageByURL(user.avatar_url, filePath)
   })
-});
+};
+getRepoContributors(process.argv[2], process.argv[3], callback)
 
 function downloadImageByURL(url, filePath) {
   var request = require('request');
